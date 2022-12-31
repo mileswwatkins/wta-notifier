@@ -24,4 +24,14 @@ jobs:
           name: all-event-ids.txt
           path: previous-event-ids.txt
       - name: Detect new event IDs
-        run: diff --changed-group-format='%<' --unchanged-group-format='' all-event-ids.txt previous-event-ids.txt
+        run: diff --changed-group-format='%<' --unchanged-group-format='' all-event-ids.txt previous-event-ids.txt > new-event-ids.txt
+      - name: Text if any updates present
+        uses: twilio-labs/actions-sms@v1
+        with:
+          fromPhoneNumber: ${{ secrets.FROM_PHONE_NUMBER }}
+          toPhoneNumber: ${{ secrets.TO_PHONE_NUMBER }}
+          message: 'Testingggg'
+        env:
+          TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
+          TWILIO_API_KEY: ${{ secrets.TWILIO_API_KEY }}
+          TWILIO_API_SECRET: ${{ secrets.TWILIO_API_SECRET }}
