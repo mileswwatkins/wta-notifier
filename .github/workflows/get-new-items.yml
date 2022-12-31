@@ -16,6 +16,6 @@ jobs:
         uses: sergeysova/jq-action@v2
         id: get_all_event_ids
         with:
-          cmd: 'echo "${{ steps.get_json.outputs.value }}" | jq ".results.all_items | map(._id) | sort | join(\",\")"'
+          cmd: 'echo "${{ steps.get_json.outputs.value }}" | jq "."'
       - name: Print output
         run: 'echo "${{ steps.get_all_event_ids.outputs.value }}"'
