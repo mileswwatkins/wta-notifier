@@ -11,26 +11,27 @@ jobs:
     steps:
       - name: Get event IDs
         uses: sergeysova/jq-action@v2
+        id: all_event_ids
         with:
-          cmd: curl --silent https://www.wta.org/volunteer/schedule/workparties.json\?regions\=Central%20Cascades\&regions\=Issaquah%20Alps\&regions\=North%20Cascades\&regions\=Puget%20Sound%20and%20Islands\&regions\=Snoqualmie%20Region\&batch_size\=10\&tab\=map\&days\=Weekends\&includeWaitlisted\=true\&date\=In%20the%20future\&includeCompleted\=false | jq ".results.all_items | map(._id) | sort" > all-event-ids.txt
-      - name: Cache event IDs
-        uses: actions/upload-artifact@v3
-        with:
-          name: all-event-ids.txt
-          path: all-event-ids.txt
-      - name: Get last run's event IDs
-        uses: actions/download-artifact@v3
-        with:
-          name: all-event-ids.txt
-          path: previous-event-ids.txt
-      - name: Detect new event IDs
-        run: diff --changed-group-format='%<' --unchanged-group-format='' all-event-ids.txt previous-event-ids.txt > new-event-ids.txt
+          cmd: curl --silent https://www.wta.org/volunteer/schedule/workparties.json\?regions\=Central%20Cascades\&regions\=Issaquah%20Alps\&regions\=North%20Cascades\&regions\=Puget%20Sound%20and%20Islands\&regions\=Snoqualmie%20Region\&batch_size\=10\&tab\=map\&days\=Weekends\&includeWaitlisted\=true\&date\=In%20the%20future\&includeCompleted\=false | jq ".results.all_items | map(._id) | sort"
+      # - name: Cache event IDs
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: all-event-ids.txt
+      #     path: all-event-ids.txt
+      # - name: Get last run's event IDs
+      #   uses: actions/download-artifact@v3
+      #   with:
+      #     name: all-event-ids.txt
+      #     path: previous-event-ids.txt
+      # - name: Detect new event IDs
+      #   run: diff --changed-group-format='%<' --unchanged-group-format='' all-event-ids.txt previous-event-ids.txt > new-event-ids.txt
       - name: Text if any updates present
         uses: twilio-labs/actions-sms@v1
         with:
           fromPhoneNumber: ${{ secrets.FROM_PHONE_NUMBER }}
           toPhoneNumber: ${{ secrets.TO_PHONE_NUMBER }}
-          message: 'Testingggg'
+          message: ${{ steps.all_event_ids.outputs.value }}
         env:
           TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
           TWILIO_API_KEY: ${{ secrets.TWILIO_API_KEY }}
