@@ -9,10 +9,12 @@ jobs:
   query:
     runs-on: ubuntu-latest
     steps:
-      - name: Get all event IDs
+      - name: Get event IDs
         uses: sergeysova/jq-action@v2
-        id: get_all_event_ids
         with:
           cmd: curl --silent https://www.wta.org/volunteer/schedule/workparties.json\?regions\=Central%20Cascades\&regions\=Issaquah%20Alps\&regions\=North%20Cascades\&regions\=Puget%20Sound%20and%20Islands\&regions\=Snoqualmie%20Region\&batch_size\=10\&tab\=map\&days\=Weekends\&includeWaitlisted\=true\&date\=In%20the%20future\&includeCompleted\=false | jq ".results.all_items | map(._id) | sort | join(\",\")" > all-event-ids.txt
-      - name: Print output
-        run: 'cat all-event-ids.txt'
+      - name: Cache event IDs
+        uses: actions/upload-artifact@v3
+        with:
+          name: all-event-ids.txt
+          path: all-event-ids.txt
