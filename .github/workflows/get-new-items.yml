@@ -2,6 +2,7 @@ on:
   push:
     branches:
       - main
+  # Run at the end of each day (Pacific Time)
   schedule:
     - cron: '0 10 * * *'
 
@@ -12,7 +13,7 @@ jobs:
       - name: Get event IDs
         uses: sergeysova/jq-action@v2
         with:
-          cmd: curl --silent https://www.wta.org/volunteer/schedule/workparties.json\?regions\=Central%20Cascades\&regions\=Issaquah%20Alps\&regions\=North%20Cascades\&regions\=Puget%20Sound%20and%20Islands\&regions\=Snoqualmie%20Region\&batch_size\=10\&tab\=map\&days\=Weekends\&includeWaitlisted\=true\&date\=In%20the%20future\&includeCompleted\=false | jq --compact-output ".results.all_items | map(._id) | sort | .[]" > all-event-ids.txt
+          cmd: curl --silent https://www.wta.org/volunteer/schedule/workparties.json\?regions\=Central%20Cascades\&regions\=Issaquah%20Alps\&regions\=North%20Cascades\&regions\=Puget%20Sound%20and%20Islands\&regions\=Snoqualmie%20Region\&batch_size\=10\&tab\=map\&days\=Weekends\&includeWaitlisted\=true\&date\=In%20the%20future\&includeCompleted\=false | jq --raw-output ".results.all_items | map(._id) | sort | .[]" > all-event-ids.txt
       - name: Cache event IDs
         uses: actions/upload-artifact@v3
         with:
@@ -37,6 +38,8 @@ jobs:
           TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
           TWILIO_API_KEY: ${{ secrets.TWILIO_API_KEY }}
           TWILIO_API_SECRET: ${{ secrets.TWILIO_API_SECRET }}
+      # This step can probably be scrapped once I'm confident that
+      # the system is working correctly
       - name: Text if have found no new events
         if: steps.new_events.outputs.value == ''
         uses: twilio-labs/actions-sms@v1
