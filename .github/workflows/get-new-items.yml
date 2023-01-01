@@ -20,9 +20,14 @@ jobs:
       - name: Get last run's event IDs
         uses: dawidd6/action-download-artifact@v2
         with:
+          # Only use `main`-branch workflow runs; might be a pain
+          # in the future
           branch: main
+          # Only use workflows that have an artifact with this step's
+          # `name` value
           search_artifacts: true
           name: all-event-ids.txt
+          # Store this previous run's file in the `cache` directory
           path: cache
       - name: Cache event IDs
         uses: actions/upload-artifact@v3
