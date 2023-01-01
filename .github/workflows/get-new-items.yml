@@ -10,13 +10,6 @@ jobs:
   query:
     runs-on: ubuntu-latest
     steps:
-      - name: Get event IDs
-        uses: sergeysova/jq-action@v2
-        with:
-          # The cURL'd URL is currently filtered down to:
-          # - Seattle region
-          # - weekend
-          cmd: curl --silent https://www.wta.org/volunteer/schedule/workparties.json\?regions\=Central%20Cascades\&regions\=Issaquah%20Alps\&regions\=North%20Cascades\&regions\=Puget%20Sound%20and%20Islands\&regions\=Snoqualmie%20Region\&batch_size\=10\&tab\=map\&days\=Weekends\&includeWaitlisted\=true\&date\=In%20the%20future\&includeCompleted\=false | jq --raw-output ".results.all_items | map(._id) | sort | .[]" > all-event-ids.txt
       - name: Get last run's event IDs
         uses: dawidd6/action-download-artifact@v2
         with:
@@ -29,6 +22,13 @@ jobs:
           name: all-event-ids.txt
           # Store this previous run's file in the `cache` directory
           path: cache
+      - name: Get event IDs
+        uses: sergeysova/jq-action@v2
+        with:
+          # The cURL'd URL is currently filtered down to:
+          # - Seattle region
+          # - weekend
+          cmd: curl --silent https://www.wta.org/volunteer/schedule/workparties.json\?regions\=Central%20Cascades\&regions\=Issaquah%20Alps\&regions\=North%20Cascades\&regions\=Puget%20Sound%20and%20Islands\&regions\=Snoqualmie%20Region\&batch_size\=10\&tab\=map\&days\=Weekends\&includeWaitlisted\=true\&date\=In%20the%20future\&includeCompleted\=false | jq --raw-output ".results.all_items | map(._id) | sort | .[]" > all-event-ids.txt
       - name: Cache event IDs
         uses: actions/upload-artifact@v3
         with:
