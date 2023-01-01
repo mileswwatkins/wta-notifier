@@ -18,10 +18,12 @@ jobs:
           # - weekend
           cmd: curl --silent https://www.wta.org/volunteer/schedule/workparties.json\?regions\=Central%20Cascades\&regions\=Issaquah%20Alps\&regions\=North%20Cascades\&regions\=Puget%20Sound%20and%20Islands\&regions\=Snoqualmie%20Region\&batch_size\=10\&tab\=map\&days\=Weekends\&includeWaitlisted\=true\&date\=In%20the%20future\&includeCompleted\=false | jq --raw-output ".results.all_items | map(._id) | sort | .[]" > all-event-ids.txt
       - name: Get last run's event IDs
-        uses: actions/download-artifact@v3
+        uses: dawidd6/action-download-artifact@v2
         with:
+          branch: main
+          search_artifacts: true
           name: all-event-ids.txt
-          path: previous-event-ids.txt
+          path: cache
       - name: Cache event IDs
         uses: actions/upload-artifact@v3
         with:
@@ -32,7 +34,7 @@ jobs:
         # Use `--changed-group-format` to prepend the base URL to
         # each of the new event IDs, and use `xargs` to switch from
         # newline delimiting to space delimiting
-        run: diff --changed-group-format='https://www.wta.org/volunteer/schedule/workparty/%<' --unchanged-group-format='' all-event-ids.txt previous-event-ids.txt | xargs
+        run: diff --changed-group-format='https://www.wta.org/volunteer/schedule/workparty/%<' --unchanged-group-format='' all-event-ids.txt cache/all-event-ids.txt | xargs
       - name: Text if have found new events
         if: steps.new_events.outputs.value != ''
         uses: twilio-labs/actions-sms@v1
