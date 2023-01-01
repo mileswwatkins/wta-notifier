@@ -17,16 +17,16 @@ jobs:
           # - Seattle region
           # - weekend
           cmd: curl --silent https://www.wta.org/volunteer/schedule/workparties.json\?regions\=Central%20Cascades\&regions\=Issaquah%20Alps\&regions\=North%20Cascades\&regions\=Puget%20Sound%20and%20Islands\&regions\=Snoqualmie%20Region\&batch_size\=10\&tab\=map\&days\=Weekends\&includeWaitlisted\=true\&date\=In%20the%20future\&includeCompleted\=false | jq --raw-output ".results.all_items | map(._id) | sort | .[]" > all-event-ids.txt
-      - name: Cache event IDs
-        uses: actions/upload-artifact@v3
-        with:
-          name: all-event-ids.txt
-          path: all-event-ids.txt
       - name: Get last run's event IDs
         uses: actions/download-artifact@v3
         with:
           name: all-event-ids.txt
           path: previous-event-ids.txt
+      - name: Cache event IDs
+        uses: actions/upload-artifact@v3
+        with:
+          name: all-event-ids.txt
+          path: all-event-ids.txt
       - name: Detect new event IDs and format
         id: new_events
         # Use `--changed-group-format` to prepend the base URL to
