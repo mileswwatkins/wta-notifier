@@ -22,6 +22,8 @@ jobs:
           name: all-event-ids.txt
           # Store this previous run's file in the `cache` directory
           path: cache
+      - name: Log the last run's event IDs
+        run: cat cache/all-event-ids.txt
       - name: Get event IDs
         uses: sergeysova/jq-action@v2
         with:
@@ -34,12 +36,14 @@ jobs:
         with:
           name: all-event-ids.txt
           path: all-event-ids.txt
+      - name: Log event IDs
+        run: cat all-event-ids.txt
       - name: Detect new event IDs and format
         id: new_events
-        # Use `--changed-group-format` to prepend the base URL to
+        # Use `--new-line-format` to prepend the base URL to
         # each of the new event IDs, and use `xargs` to switch from
         # newline delimiting to space delimiting
-        run: diff --changed-group-format='https://www.wta.org/volunteer/schedule/workparty/%<' --unchanged-group-format='' all-event-ids.txt cache/all-event-ids.txt | xargs
+        run: diff --ignore-space-change --ignore-blank-lines --old-line-format="" --unchanged-line-format="" --new-line-format="https://www.wta.org/volunteer/schedule/workparty/%l " cache/all-event-ids.txt all-event-ids.txt | xargs
       - name: Text if have found new events
         if: steps.new_events.outputs.value != ''
         uses: twilio-labs/actions-sms@v1
