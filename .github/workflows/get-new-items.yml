@@ -43,7 +43,7 @@ jobs:
         # Use `--new-line-format` to prepend the base URL to
         # each of the new event IDs, and use `xargs` to switch from
         # newline delimiting to space delimiting
-        run: diff --ignore-space-change --ignore-blank-lines --old-line-format="" --unchanged-line-format="" --new-line-format="https://www.wta.org/volunteer/schedule/workparty/%l " cache/all-event-ids.txt all-event-ids.txt | xargs
+        run: diff --ignore-space-change --ignore-blank-lines --old-line-format="" --unchanged-line-format="" --new-line-format="https://www.wta.org/volunteer/schedule/workparty/%l " cache/all-event-ids.txt all-event-ids.txt | xargs >> $GITHUB_OUTPUT
       - name: Text if have found new events
         if: steps.new_events.outputs.value != ''
         uses: twilio-labs/actions-sms@v1
