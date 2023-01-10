@@ -4,7 +4,7 @@ on:
       - main
   # Run at the end of each day (Pacific Time)
   schedule:
-    - cron: '0 10 * * *'
+    - cron: '0 2 * * *'
 
 jobs:
   query:
