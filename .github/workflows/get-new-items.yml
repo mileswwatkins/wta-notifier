@@ -41,11 +41,12 @@ jobs:
       - name: Detect new event IDs and format
         id: new_events
         # Use `--new-line-format` to prepend the base URL to
-        # each of the new event IDs, and use `xargs` to switch from
-        # newline delimiting to space delimiting
+        # each of the new event IDs, and use `xargs` and `tr`
+        # to clean up the output and make it newline-delimited
+        # for easier reading
         run: |
           echo "event_urls<<EOF" >> $GITHUB_OUTPUT
-          diff --ignore-space-change --ignore-blank-lines --old-line-format="" --unchanged-line-format="" --new-line-format="https://www.wta.org/volunteer/schedule/workparty/%l " cache/all-event-ids.txt all-event-ids.txt | xargs >> $GITHUB_OUTPUT
+          diff --ignore-space-change --ignore-blank-lines --old-line-format="" --unchanged-line-format="" --new-line-format="https://www.wta.org/volunteer/schedule/workparty/%l " cache/all-event-ids.txt all-event-ids.txt | xargs | tr ' ' '\n' >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
       - name: Text if have found new events
         if: steps.new_events.outputs.event_urls != ''
@@ -53,7 +54,7 @@ jobs:
         with:
           fromPhoneNumber: ${{ secrets.FROM_PHONE_NUMBER }}
           toPhoneNumber: ${{ secrets.TO_PHONE_NUMBER }}
-          message: 'New WTA events found: ${{ steps.new_events.outputs.event_urls }}'
+          message: 'New WTA events found:\n${{ steps.new_events.outputs.event_urls }}'
         env:
           TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
           TWILIO_API_KEY: ${{ secrets.TWILIO_API_KEY }}
