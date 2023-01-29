@@ -50,7 +50,9 @@ jobs:
         with:
           fromPhoneNumber: ${{ secrets.FROM_PHONE_NUMBER }}
           toPhoneNumber: ${{ secrets.TO_PHONE_NUMBER }}
-          message: 'New WTA events found:\n${{ steps.new_events.outputs.event_urls }}'
+          message: |-
+            New WTA events found:
+            ${{ steps.new_events.outputs.event_urls }}
         env:
           TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
           TWILIO_API_KEY: ${{ secrets.TWILIO_API_KEY }}
