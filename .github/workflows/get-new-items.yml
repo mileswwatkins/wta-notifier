@@ -29,20 +29,18 @@ jobs:
           # - Seattle region
           # - weekend
           cmd: curl --silent https://www.wta.org/volunteer/schedule/workparties.json\?regions\=Central%20Cascades\&regions\=Issaquah%20Alps\&regions\=North%20Cascades\&regions\=Puget%20Sound%20and%20Islands\&regions\=Snoqualmie%20Region\&batch_size\=10\&tab\=map\&days\=Weekends\&includeWaitlisted\=true\&date\=In%20the%20future\&includeCompleted\=false | jq --raw-output ".results.all_items | map(._id) | sort | .[]" > all-event-ids.txt
-      - name: Cache event IDs
-        uses: actions/upload-artifact@v3
-        with:
-          name: all-event-ids.txt
-          path: all-event-ids.txt
       - name: Detect new event IDs and format
         id: new_events
         # Use `--new-line-format` to prepend the base URL to
         # each of the new event IDs, and use `xargs` and `tr`
         # to clean up the output and make it newline-delimited
-        # for easier reading
+        # for easier reading. Furthermore, use `grep` to trim
+        # the output down to within the 1,600-character Twilio
+        # messaging limit – will lose some events but that's
+        # acceptable.
         run: |
           echo "event_urls<<EOF" >> $GITHUB_OUTPUT
-          diff --ignore-space-change --ignore-blank-lines --old-line-format="" --unchanged-line-format="" --new-line-format="https://www.wta.org/volunteer/schedule/workparty/%l " cache/all-event-ids.txt all-event-ids.txt | xargs | tr ' ' '\n' >> $GITHUB_OUTPUT
+          diff --ignore-space-change --ignore-blank-lines --old-line-format="" --unchanged-line-format="" --new-line-format="https://wta.org/volunteer/schedule/workparty/%l " cache/all-event-ids.txt all-event-ids.txt | xargs | grep -oE "^.{1,1500}\w*" | tr ' ' '\n' >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
       - name: Text if have found new events
         if: steps.new_events.outputs.event_urls != ''
@@ -57,3 +55,10 @@ jobs:
           TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
           TWILIO_API_KEY: ${{ secrets.TWILIO_API_KEY }}
           TWILIO_API_SECRET: ${{ secrets.TWILIO_API_SECRET }}
+      # Save this step for the end, in case the others don't
+      # complete successfully
+      - name: Cache event IDs
+        uses: actions/upload-artifact@v3
+        with:
+          name: all-event-ids.txt
+          path: all-event-ids.txt
