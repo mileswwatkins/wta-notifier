@@ -40,7 +40,7 @@ jobs:
         # acceptable.
         run: |
           echo "event_urls<<EOF" >> $GITHUB_OUTPUT
-          diff --ignore-space-change --ignore-blank-lines --old-line-format="" --unchanged-line-format="" --new-line-format="https://wta.org/volunteer/schedule/workparty/%l " cache/all-event-ids.txt all-event-ids.txt | xargs | grep -oE "^.{1,1500}\w*" | tr ' ' '\n' >> $GITHUB_OUTPUT
+          diff --ignore-space-change --ignore-blank-lines --old-line-format="" --unchanged-line-format="" --new-line-format="https://wta.org/volunteer/schedule/workparty/%l " cache/all-event-ids.txt all-event-ids.txt | xargs | grep -oE "^.{1,1500}\S*" | tr ' ' '\n' >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
       - name: Text if have found new events
         if: steps.new_events.outputs.event_urls != ''
